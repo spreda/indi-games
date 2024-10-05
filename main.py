@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 import asyncio
 import logging
 import sys
@@ -8,55 +7,60 @@ from aiogram import Bot, Dispatcher, html
 from aiogram.client.default import DefaultBotProperties
 from aiogram.enums import ParseMode
 from aiogram.filters import CommandStart
-from aiogram.types import Message
-from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton, KeyboardButton, WebAppInfo
+from aiogram.types import Message, InlineKeyboardMarkup, InlineKeyboardButton
+from aiogram.types import KeyboardButton, WebAppInfo, CallbackQuery
 
-# Bot token can be obtained via https://t.me/BotFather
+# Токен бота можно получить через https://t.me/BotFather
 TOKEN = getenv("BOT_TOKEN")
 WEB_APP_URL = getenv("WEB_APP_URL")
 
-# All handlers should be attached to the Router (or Dispatcher)
+# Все обработчики должны быть подключены к диспетчеру
 dp = Dispatcher()
 
 @dp.message(CommandStart())
 async def send_welcome(message: Message) -> None:
     """
-    This handler receives messages with `/start` command
+    Обработчик для команды /start
+    Показывает приветственное сообщение с выбором игр.
     """
-    # Most event objects have aliases for API methods that can be called in events' context
-    # For example if you want to answer to incoming message you can use `message.answer(...)` alias
-    # and the target chat will be passed to :ref:`aiogram.methods.send_message.SendMessage`
-    # method automatically or call API method directly via
-    # Bot instance: `bot.send_message(chat_id=message.chat.id, ...)`
-    
-    ikb = InlineKeyboardButton(text="Перейти", web_app=WebAppInfo(url=f"{WEB_APP_URL}"))
+    # Создание кнопок для выбора игр    
+    snake = InlineKeyboardButton(text="Змейка", web_app=WebAppInfo(url=f"{WEB_APP_URL}"))
+    sea_battle = InlineKeyboardButton(text="Морской бой", callback_data="sea_battle")
+    rock_paper_scissors = InlineKeyboardButton(text="Камень ножницы бумага", callback_data="rock_paper_scissors")
 
-    # Create an InlineKeyboardMarkup and add the button
-    keyboard = InlineKeyboardMarkup(inline_keyboard=[[ikb]])
+    # Создание разметки клавиатуры и добавление кнопок
+    keyboard = InlineKeyboardMarkup(inline_keyboard=[[snake], [sea_battle], [rock_paper_scissors]])
 
-    await message.answer(f"Добро пожаловать, {message.from_user.full_name}! Нажмите на кнопку ниже:", reply_markup=keyboard)
+    # Отправка приветственного сообщения с клавиатурой
+    await message.answer(f"Добро пожаловать, {message.from_user.full_name}! Выберите игру:", reply_markup=keyboard)
 
 
 @dp.message()
 async def echo_handler(message: Message) -> None:
     """
-    Handler will forward receive a message back to the sender
-
-    By default, message handler will handle all message types (like a text, photo, sticker etc.)
+    Обработчик для любых сообщений, который пересылает отправленное сообщение обратно.
     """
     try:
-        # Send a copy of the received message
+        # Отправка копии полученного сообщения обратно отправителю
         await message.send_copy(chat_id=message.chat.id)
     except TypeError:
-        # But not all the types is supported to be copied so need to handle it
-        await message.answer("Nice try!")
+        # Обработка типов сообщений, которые не поддерживаются для копирования
+        await message.answer("Хорошая попытка!")
 
+
+@dp.callback_query()
+async def process_callback_button1(callback_query: CallbackQuery):
+    """
+    Обработчик для нажатий на кнопки клавиатуры.
+    """
+    await callback_query.answer()
+    await callback_query.message.answer(text=f'{callback_query.data} [Placeholder]')
 
 async def main() -> None:
-    # Initialize Bot instance with default bot properties which will be passed to all API calls
+    # Инициализация экземпляра бота с настройками по умолчанию
     bot = Bot(token=TOKEN, default=DefaultBotProperties(parse_mode=ParseMode.HTML))
 
-    # And the run events dispatching
+    # Запуск диспетчера для обработки событий
     await dp.start_polling(bot)
 
 
