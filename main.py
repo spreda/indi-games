@@ -22,7 +22,7 @@ dp = Dispatcher(storage=storage)
 
 async def send_menu(message: Message):
     # Создание кнопок для выбора игр    
-    snake = InlineKeyboardButton(text="Змейка", web_app=WebAppInfo(url=f"{WEB_APP_URL}"))
+    snake = InlineKeyboardButton(text="Змейка", web_app=WebAppInfo(url=f"{WEB_APP_URL}/games/Snake/snake.html"))
     sea_battle = InlineKeyboardButton(text="Морской бой", callback_data="sea_battle")
     rps = InlineKeyboardButton(text="Камень ножницы бумага", callback_data="rps_start")
 
