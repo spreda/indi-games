@@ -1,6 +1,31 @@
 import random
 
-class Battleship:
+class BattleshipSession:
+    def __init__(self, player1_name, player2_name, board_size, ship_limits):
+        self.player1 = BattleshipBoard(player1_name, board_size, ship_limits)
+        self.player2 = BattleshipBoard(player2_name, board_size, ship_limits)
+        self.current_player = self.player1
+        self.opponent = self.player2
+        self.attempts = 0
+        self.max_attempts = 20  # Общее количество попыток
+
+    def process_turn(self, x, y):
+        hit = self.opponent.make_guess(x, y, self.current_player)
+
+        # Передаем ход другому игроку
+        self.current_player, self.opponent = self.opponent, self.current_player
+        self.attempts += 1
+
+        return hit
+
+    def is_game_over(self):
+        if self.attempts < self.max_attempts:
+            if self.player1.ship_positions and self.player2.ship_positions:
+                return False
+        return True
+
+
+class BattleshipBoard:
     def __init__(self, player_name, board_size, ship_limits):
         self.player_name = player_name
         self.size = board_size
@@ -52,9 +77,9 @@ class Battleship:
             print(' '.join(row))
         print()
 
-    def make_guess(self, x, y):
+    def make_guess(self, x, y, attacker):
         if (x, y) in self.ship_positions:
-            print(f"{self.player_name} попал!")
+            print(f"{attacker.player_name} попал!")
             self.board[x][y] = 'X'  # Замена на 'X' при попадании
             self.ship_positions.remove((x, y))
             if not any(pos[0] == x and pos[1] == y for pos in self.ship_positions):  # Проверка на уничтожение корабля
@@ -82,15 +107,11 @@ def main():
         else:
             print("Неверный выбор. Пожалуйста, выберите '5x5' или '10x10'.")
 
-    player1 = Battleship(player1_name, board_size, ship_limits)
-    player2 = Battleship(player2_name, board_size, ship_limits)
+    session = BattleshipSession(player1_name, player2_name, board_size, ship_limits)
 
-    current_player = player1
-    opponent = player2
-    attempts = 0
-    max_attempts = 20  # Общее количество попыток
-
-    while attempts < max_attempts and (player1.ship_positions or player2.ship_positions):
+    while not session.is_game_over():
+        current_player = session.current_player
+        print(session.player1.ship_positions, session.player2.ship_positions)
         print(f"\nХод {current_player.player_name}:")
         current_player.print_board()
 
@@ -101,19 +122,14 @@ def main():
             except ValueError:
                 print("Пожалуйста, введите целые числа.")
                 continue
-
-            if 0 <= x < current_player.size and 0 <= y < current_player.size:
-                hit = opponent.make_guess(x, y)
-                if hit:
-                    if not opponent.ship_positions:
-                        print(f"{current_player.player_name} выиграл! Все корабли противника уничтожены!")
-                        return
+            if (0 <= x < current_player.size) and (0 <= y < current_player.size):
                 break
             else:
                 print("Координаты вне диапазона. Попробуйте снова.")
 
-        current_player, opponent = opponent, current_player  # Передаем ход другому игроку
-        attempts += 1
+        session.process_turn(x, y)
+    
+    print(f"{current_player.player_name} выиграл! Все корабли противника уничтожены!")
 
 if __name__ == "__main__":
     main()
