@@ -4,7 +4,7 @@ from aiogram.fsm.context import FSMContext
 from aiogram.filters.state import State, StatesGroup
 
 # Подключение логики игры 'Камень-Ножницы-Бумага'
-from games.rps import rps
+from games.RPS import rps
 
 # Состояния для конечного автомата (FSM)
 class RPSStates(StatesGroup):

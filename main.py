@@ -10,7 +10,7 @@ from aiogram.enums import ParseMode
 from aiogram.filters import Command, CommandStart
 from aiogram.types import Message, InlineKeyboardMarkup, InlineKeyboardButton, ReplyKeyboardRemove
 from aiogram.types import KeyboardButton, WebAppInfo, CallbackQuery
-from games.rps import rps_adapter
+from games.RPS import rps_adapter
 
 # Получаем токен бота и URL веб-приложения из переменных окружения
 TOKEN = getenv('BOT_TOKEN')
