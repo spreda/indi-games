@@ -33,7 +33,7 @@ def add_site_packages_to_path():
 def load_env_variables(env_file='.env'):
     if not os.path.exists(env_file):
         print(f"Файл {env_file} не найден.")
-        sys.exit(1)
+        return
     
     add_site_packages_to_path()  # Добавляем site-packages в sys.path перед импортом dotenv
     import dotenv
