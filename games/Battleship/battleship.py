@@ -92,14 +92,14 @@ class BattleshipPlayer:
         result_message = ''
         if (x, y) in self.ship_positions:
             result_message += f"{attacker.name} попал!\n"
-            self.board[x][y] = 'X'  # Замена на 'X' при попадании
+            self.board[y][x] = 'X'  # Замена на 'X' при попадании
             self.ship_positions.remove((x, y))
             if not any(pos[0] == x and pos[1] == y for pos in self.ship_positions):  # Проверка на уничтожение корабля
                 result_message += f"Корабль игрока {self.name} уничтожен!\n"
             return True, result_message  # Попадание
         else:
             result_message += "Мимо!\n"
-            self.board[x][y] = 'O'  # Замена на 'O' при промахе
+            self.board[y][x] = 'O'  # Замена на 'O' при промахе
             return False, result_message  # Мимо
 
 def main():
