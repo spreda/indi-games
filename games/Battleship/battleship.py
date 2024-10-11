@@ -2,8 +2,8 @@ import random
 
 class BattleshipSession:
     def __init__(self, player1_name, player2_name, board_size, ship_limits):
-        self.player1 = BattleshipBoard(player1_name, board_size, ship_limits)
-        self.player2 = BattleshipBoard(player2_name, board_size, ship_limits)
+        self.player1 = BattleshipPlayer(player1_name, board_size, ship_limits)
+        self.player2 = BattleshipPlayer(player2_name, board_size, ship_limits)
         self.current_player = self.player1
         self.opponent = self.player2
         self.attempts = 0
@@ -35,9 +35,9 @@ class BattleshipSession:
         return True
 
 
-class BattleshipBoard:
-    def __init__(self, player_name, board_size, ship_limits):
-        self.player_name = player_name
+class BattleshipPlayer:
+    def __init__(self, name, board_size, ship_limits):
+        self.name = name
         self.size = board_size
         self.board = [['~'] * self.size for _ in range(self.size)]
         self.ship_positions = set()
@@ -82,19 +82,20 @@ class BattleshipBoard:
         return True
 
     def render_board(self):
-        board = f"\nХод {current_player.player_name}:\n"
+        lines = []
         for row in self.board:
-            board += ' '.join(row) + '\n'
-        return f"Доска игрока {self.player_name}:\n{board}\n"
+            lines.append(' '.join(row))
+        board = '\n'.join(lines)
+        return f"Доска игрока {self.name}:\n{board}"
 
     def make_guess(self, x, y, attacker):
         result_message = ''
         if (x, y) in self.ship_positions:
-            result_message += f"{attacker.player_name} попал!\n"
+            result_message += f"{attacker.name} попал!\n"
             self.board[x][y] = 'X'  # Замена на 'X' при попадании
             self.ship_positions.remove((x, y))
             if not any(pos[0] == x and pos[1] == y for pos in self.ship_positions):  # Проверка на уничтожение корабля
-                result_message += f"Корабль игрока {self.player_name} уничтожен!\n"
+                result_message += f"Корабль игрока {self.name} уничтожен!\n"
             return True, result_message  # Попадание
         else:
             result_message += "Мимо!\n"
@@ -121,7 +122,8 @@ def main():
     session = BattleshipSession(player1_name, player2_name, board_size, ship_limits)
 
     while not session.is_game_over():
-        print(session.current_player.render_board())
+        print(f"\nХод {session.current_player}:\n")
+        print(session.opponent.render_board())
 
         while True:
             x = input("Введите координату X (0-4 или 0-9): ")
@@ -134,7 +136,7 @@ def main():
         hit, hit_text = session.process_turn(x, y)
         print(hit_text)
     
-    print(f"{session.opponent.player_name} выиграл! Все корабли противника уничтожены!")
+    print(f"{session.opponent.name} выиграл! Все корабли противника уничтожены!")
 
 if __name__ == "__main__":
     main()

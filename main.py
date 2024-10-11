@@ -11,6 +11,7 @@ from aiogram.filters import Command, CommandStart
 from aiogram.types import Message, InlineKeyboardMarkup, InlineKeyboardButton, ReplyKeyboardRemove
 from aiogram.types import KeyboardButton, WebAppInfo, CallbackQuery
 from games.RPS import rps_adapter
+from games.Battleship import battleship_adapter
 
 # Получаем токен бота и URL веб-приложения из переменных окружения
 TOKEN = getenv('BOT_TOKEN')
@@ -25,7 +26,7 @@ async def send_menu(message: Message):
     Функция отправки сообщения со списком игр. 
     """    
     snake = InlineKeyboardButton(text='Змейка', web_app=WebAppInfo(url=f'{WEB_APP_URL}/games/Snake/snake.html'))
-    battleship = InlineKeyboardButton(text='Морской бой', callback_data='battleship')
+    battleship = InlineKeyboardButton(text='Морской бой', callback_data='battleship_start')
     rps = InlineKeyboardButton(text='Камень ножницы бумага', callback_data='rps_start')
 
     # Формируем разметку с кнопками для выбора игры
@@ -44,16 +45,6 @@ async def send_welcome(message: Message, state: FSMContext):
     await message.answer(text=f'Добро пожаловать, {message.from_user.full_name}!', reply_markup=ReplyKeyboardRemove())
     await send_menu(message)
 
-@dp.callback_query(F.data == 'battleship')
-async def process_menu_callback(callback_query: CallbackQuery):
-    """
-    Обработчик для кнопки "Морской бой"
-    """
-    await callback_query.answer()
-    message = callback_query.message
-    data = callback_query.data
-    await message.answer(text=f'{data} [Placeholder]')
-
 async def main():
     """
     Основная точка входа в приложение. 
@@ -64,6 +55,10 @@ async def main():
     # Подключаем маршруты игры "Камень-Ножницы-Бумага"
     rps_router = await rps_adapter.setup_game()
     dp.include_router(rps_router)
+    
+    # Подключаем маршруты игры "Морской бой"
+    battleship_router = await battleship_adapter.setup_game()
+    dp.include_router(battleship_router)
 
     # Запускаем диспетчер для обработки событий
     await dp.start_polling(bot)
@@ -78,5 +73,5 @@ async def print_state(message: Message, state: FSMContext):
     await message.answer(text=f'{state}')
 
 if __name__ == '__main__':
-    logging.basicConfig(level=logging.DEBUG, stream=sys.stdout)
+    logging.basicConfig(level=logging.INFO, stream=sys.stdout)
     asyncio.run(main()) # Запуск основного цикла программы
