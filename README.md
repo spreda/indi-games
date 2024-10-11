@@ -29,6 +29,7 @@ cd indi-games
 ```bash
 export BOT_TOKEN="Bot token can be obtained via https://t.me/BotFather"
 export WEB_APP_URL="https://example.com"
+```
 5. Запустите скрипт установки
 ```bash
 python3 setup.py
