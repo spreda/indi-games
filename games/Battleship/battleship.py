@@ -9,14 +9,24 @@ class BattleshipSession:
         self.attempts = 0
         self.max_attempts = 20  # Общее количество попыток
 
-    def process_turn(self, x, y):
-        hit = self.opponent.make_guess(x, y, self.current_player)
+    def validate_input(self, x, y):
+        try:
+            x = int(x)
+            y = int(y)
+        except ValueError:
+            return "Пожалуйста, введите целые числа."
+        if (0 <= x < self.current_player.size) and (0 <= y < self.current_player.size):
+            return None # Отсутствие сообщения об ошибке
+        else:
+            return "Координаты вне диапазона. Попробуйте снова."
 
+    def process_turn(self, x, y):
+        x, y = int(x), int(y)
+        hit, hit_text = self.opponent.make_guess(x, y, self.current_player)
         # Передаем ход другому игроку
         self.current_player, self.opponent = self.opponent, self.current_player
         self.attempts += 1
-
-        return hit
+        return hit, hit_text
 
     def is_game_over(self):
         if self.attempts < self.max_attempts:
@@ -71,24 +81,25 @@ class BattleshipBoard:
                     return False
         return True
 
-    def print_board(self):
-        print(f"Доска игрока {self.player_name}:")
+    def render_board(self):
+        board = f"\nХод {current_player.player_name}:\n"
         for row in self.board:
-            print(' '.join(row))
-        print()
+            board += ' '.join(row) + '\n'
+        return f"Доска игрока {self.player_name}:\n{board}\n"
 
     def make_guess(self, x, y, attacker):
+        result_message = ''
         if (x, y) in self.ship_positions:
-            print(f"{attacker.player_name} попал!")
+            result_message += f"{attacker.player_name} попал!\n"
             self.board[x][y] = 'X'  # Замена на 'X' при попадании
             self.ship_positions.remove((x, y))
             if not any(pos[0] == x and pos[1] == y for pos in self.ship_positions):  # Проверка на уничтожение корабля
-                print(f"Корабль игрока {self.player_name} уничтожен!")
-            return True  # Попадание
+                result_message += f"Корабль игрока {self.player_name} уничтожен!\n"
+            return True, result_message  # Попадание
         else:
-            print("Мимо!")
+            result_message += "Мимо!\n"
             self.board[x][y] = 'O'  # Замена на 'O' при промахе
-            return False  # Мимо
+            return False, result_message  # Мимо
 
 def main():
     player1_name = input("Введите имя Игрока 1: ")
@@ -110,26 +121,20 @@ def main():
     session = BattleshipSession(player1_name, player2_name, board_size, ship_limits)
 
     while not session.is_game_over():
-        current_player = session.current_player
-        print(session.player1.ship_positions, session.player2.ship_positions)
-        print(f"\nХод {current_player.player_name}:")
-        current_player.print_board()
+        print(session.current_player.render_board())
 
         while True:
-            try:
-                x = int(input("Введите координату X (0-4 или 0-9): "))
-                y = int(input("Введите координату Y (0-4 или 0-9): "))
-            except ValueError:
-                print("Пожалуйста, введите целые числа.")
-                continue
-            if (0 <= x < current_player.size) and (0 <= y < current_player.size):
+            x = input("Введите координату X (0-4 или 0-9): ")
+            y = input("Введите координату Y (0-4 или 0-9): ")
+            error_message = session.validate_input(x, y)
+            print(error_message)
+            if error_message is None:
                 break
-            else:
-                print("Координаты вне диапазона. Попробуйте снова.")
 
-        session.process_turn(x, y)
+        hit, hit_text = session.process_turn(x, y)
+        print(hit_text)
     
-    print(f"{current_player.player_name} выиграл! Все корабли противника уничтожены!")
+    print(f"{session.opponent.player_name} выиграл! Все корабли противника уничтожены!")
 
 if __name__ == "__main__":
     main()
