@@ -12,18 +12,35 @@
 - `requirements.txt`: Список зависимостей Python, необходимых для проекта.
 - `main.py`: Основной скрипт приложения.
 
-## Локальное Развертывание
+## Установка и Локальное Развертывание
+1. Убедитесь, чо установлены: Python3.9 или новее, pip и python3-venv
 ```bash
-python setup.py
+python3 --version
+sudo apt update
+sudo apt upgrade
+sudo apt install python3-pip python3-venv
+```
+2. Скачайте репозиторий
+```bash
+git clone https://github.com/spreda/indi-games.git
+cd indi-games
+```
+3. Настройте переменные окружения по примеру из файла .env.template или пропишите их в .env
+```bash
+export BOT_TOKEN="Bot token can be obtained via https://t.me/BotFather"
+export WEB_APP_URL="https://example.com"
+5. Запустите скрипт установки
+```bash
+python3 setup.py
 ```
 
 ## Настройка Тестового Окружения
 ```bash
-python setup.py .env.test
+python3 setup.py .env.test
 ```
 
 ## Использование
-После настройки окружения и установки зависимостей вы можете запустить бота с помощью команды:
+После настройки переменных окружения и установки зависимостей вы можете запустить бота с помощью команды:
 ```bash
-python main.py
+python3 main.py
 ```
