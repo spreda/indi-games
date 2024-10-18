@@ -57,7 +57,7 @@ async def main():
     dp.include_router(rps_router)
     
     # Подключаем маршруты игры "Морской бой"
-    battleship_router = await battleship_adapter.setup_game()
+    battleship_router = await battleship_adapter.setup_game(dp.storage)
     dp.include_router(battleship_router)
 
     # Запускаем диспетчер для обработки событий

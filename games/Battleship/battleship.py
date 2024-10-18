@@ -2,10 +2,10 @@ import random
 
 class BattleshipSession:
     def __init__(self, player1_name, player2_name, board_size, ship_limits):
-        self.player1 = BattleshipPlayer(player1_name, board_size, ship_limits)
-        self.player2 = BattleshipPlayer(player2_name, board_size, ship_limits)
-        self.current_player = self.player1
-        self.opponent = self.player2
+        self.board_1 = BattleshipPlayer(player1_name, board_size, ship_limits)
+        self.board_2 = BattleshipPlayer(player2_name, board_size, ship_limits)
+        self.current_player = self.board_1
+        self.opponent = self.board_2
         self.attempts = 0
         self.max_attempts = 20  # Общее количество попыток
 
@@ -30,7 +30,7 @@ class BattleshipSession:
 
     def is_game_over(self):
         if self.attempts < self.max_attempts:
-            if self.player1.ship_positions and self.player2.ship_positions:
+            if self.board_1.ship_positions and self.board_2.ship_positions:
                 return False
         return True
 
