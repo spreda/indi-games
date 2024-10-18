@@ -124,6 +124,9 @@ async def process_turn(message: Message, state: FSMContext):
     session = get_session(message)
     current_player = session.get_current_player()
     opponent = session.get_opponent()
+
+    await opponent.answer(text=f'{current_player}: {message.text}')
+
     # Нормализуем ввод пользователя
     p_turn = message.text.strip().lower()
 
